@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from markdown_blocks import *
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"... from {from_path} to {dest_path} using {template_path}")
     
     #with open(from_path, "r", encoding="utf-8") as f:
@@ -30,6 +30,12 @@ def generate_page(from_path, template_path, dest_path):
         .replace("{{ Content }}", html_content)
     )
 
+    full_html = (
+        full_html
+        .replace('href="/', f'href="{basepath}')
+        .replace('src="/', f'src="{basepath}')
+    )
+
     #if not os.path.exists(dest_path):
     #    os.makedirs(dest_path)
     #with open(dest_path, "w", encoding="utf-8") as f:
@@ -42,14 +48,17 @@ def generate_page(from_path, template_path, dest_path):
     to_file.write(full_html)
 
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     for name in os.listdir(dir_path_content): #listdir → gets all items (files and folders) inside the current directory.
+        if name.startswith("."):
+            continue
+        
         src = os.path.join(dir_path_content, name) # → the full path of the item in the content directory.
         dst = os.path.join(dest_dir_path, name) # → the corresponding full path in the destination directory.
         #This way, src and dst always “mirror” each other’s structure.
 
         if os.path.isfile(src) and name.lower().endswith(".md"): # Only process Markdown files (skip binaries, .DS_Store, etc.)
             dst = Path(dst).with_suffix(".html")
-            generate_page(src, template_path, dst)
+            generate_page(src, template_path, dst, basepath)
         else:
-            generate_pages_recursive(src, template_path, dst) # Recurse into subdirectories, mirroring structure in dest
+            generate_pages_recursive(src, template_path, dst, basepath) # Recurse into subdirectories, mirroring structure in dest
