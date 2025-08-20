@@ -17,12 +17,12 @@ def main():
     #dest_dir_path = "docs"
 
     #print("Deleting public directory...")
-    #if os.path.exists(dir_path_public):
-    #    shutil.rmtree(dir_path_public)
+    if os.path.exists(dir_path_public):
+        shutil.rmtree(dir_path_public)
 
-    #print("Copying static files to public directory...")
-    #shutil.copytree(dir_path_static, dir_path_public)
-    #print("Finished copying everything")
+    print("Copying static files to public directory...")
+    shutil.copytree(dir_path_static, dir_path_public)
+    print("Finished copying everything")
 
     print("Generating page...")
     generate_pages_recursive(
